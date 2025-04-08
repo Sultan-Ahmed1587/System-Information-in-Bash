@@ -1,0 +1,75 @@
+#!/bin/bash
+
+fives_cancel=1
+fives_esc=255
+height=0
+width=0
+#variables that ditermin the gui such as hieght of the dialog menu.
+five_system_output() {
+  dialog --title "$1" \
+     --msgbox "$result" 0 0
+}
+# function to create dialog gui.
+while true; do
+  exec 3>&1
+  five_system_options=$(dialog \
+    --title "--- Five System Configuration Information ---" \
+    --cancel-label "Quit" \
+    --menu "Select a button to see hte following Information:" $height $width 8 \
+    "-1" ">Display Operating System<" \
+    "-2" ">Display CPU Information<" \
+    "-3" ">Display Memory Information<" \
+    "-4" ">Display Hard Disk Information<" \
+    "-5" ">SSD/ Hard Disk Partition<" \
+    "-6" ">Display File System(Mounted)<" \
+    "-7" ">Main-Menu<" \
+    2>&1 1>&3)
+#while statment activates once function is called and then creates buttons.
+  quit_status=$?
+  exec 3>&-
+  case $quit_status in
+    $fives_cancel)
+      clear
+      echo "The FiveSytem script has been terminated."
+      exit
+      ;;
+    $fives_esc)
+      clear
+      echo "The FiveSystem script has been aborted." 
+      exit 1
+      ;;
+  esac
+#quit button with message to leave the dialog menu by pressing escape or clicking on quit button.
+  case $five_system_options in    
+   -1 )
+      result=$(lsb_release -a)
+      five_system_output "Operating System type"
+      ;;
+   -2 )
+      result=$(cat /proc/cpuinfo)
+      five_system_output "CPU information"
+      ;;
+   -3 )
+      result=$(cat /proc/meminfo)
+      five_system_output "Memory information"
+      ;;
+   -4 )
+      result=$(ls -lF /dev/disk/by-id/)
+      five_system_output "Hard disk information"
+      ;;
+   -5 )
+      result=$(sudo fdisk -l)
+      five-system_output "SSD / Hard disk partition"
+      ;;
+   -6 )
+      result=$(df -Ph $filename)
+      five_system_output "File system [mounted]"
+      ;;
+   -7 ) 
+      result= ./MainMenu
+    
+      ;;    
+  esac
+done
+#allows the button to execute terminal commands such as date and then displays the date.
+#opens the second bash script file to run the config menu gui.

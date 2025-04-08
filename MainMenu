@@ -1,0 +1,59 @@
+#!/bin/bash
+
+menu_cancel=1
+menu_esc=255
+height=0
+width=0
+#variables that ditermin the gui such as hieght of the dialog menu.
+menu_output() {
+  dialog --title "$1" \
+    --msgbox "$result" 0 0
+}
+# function to create dialog gui.
+while true; do
+  exec 3>&1
+  menu_options=$(dialog \
+    --title "--- Main-Menu ---" \
+    --cancel-label "Quit" \
+    --menu "Select the following options to view the Information:" $height $width 5 \
+    "-1" ">Date& Time<" \
+    "-2" ">Calendar<" \
+    "-3" ">Free Memory<" \
+    "-4" ">Five System Configuration<" \
+    2>&1 1>&3)
+#while statment activates once function is called and then creates buttons.
+  quit_status=$?
+  exec 3>&-
+  case $quit_status in
+    $menu_cancel)
+      clear
+      echo "The Main Menu script has been terminated."
+      exit
+      ;;
+    $menu_esc)
+      clear
+      echo "The Main Menu script has been aborted." 
+      exit 1
+      ;;
+  esac
+#quit button with message to leave the dialog menu by pressing escape or clicking on quit button.
+  case $menu_options in
+    -1 )
+      result=$(echo "`date`";)
+      menu_output "Date & Time"
+      ;;
+    -2 )
+      result=$(echo "`cal`";)
+      menu_output "Calendar"
+      ;;
+    -3 )
+      result=$(echo "`free`";) 
+      menu_output "Free Memory" 
+      ;;
+    -4 )
+      result= ./FiveSystem
+      ;;
+  esac
+done
+#allows the button to execute terminal commands such as date and then displays the date.
+#opens the second bash script file to run the config menu gui.
